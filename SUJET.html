@@ -1,0 +1,100 @@
+<html><head><title>FDI-DOKR | Project contained vote app</title><link rel="stylesheet" href="https://dl.etna-alternance.net/sujets/prism.css"><link rel="stylesheet" href="https://dl.etna-alternance.net/sujets/sujet.css"><script type="text/javascript" src="https://dl.etna-alternance.net/sujets/prism.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js"></script><script type="text/javascript" src="https://kit.fontawesome.com/2128552f47.js"></script><meta charset="UTF-8"></head><body><div class="panel-heading panel-header">FDI-DOKR | Project contained vote app</div><div class="panel-heading panel-module">Modalités</div><div class="panel-body"><table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dépôt</td>
+<td>https://rendu-git.etna-alternance.net/module-10600/activity-57763/group-1087548</td>
+</tr>
+<tr>
+<td>Correction</td>
+<td>Moulinette</td>
+</tr>
+<tr>
+<td>Durée</td>
+<td>2 jours</td>
+</tr>
+<tr>
+<td>Effectif</td>
+<td>Seul</td>
+</tr>
+</tbody></table>
+</div><div class="panel-heading panel-objective">Objectifs</div><div class="panel-body"><ul>
+<li>Conteneuriser une application de vote avec plusieurs services, le tout orchestré par un docker-compose</li>
+</ul>
+</div><div class="panel-heading panel-project">Consignes Dockerfiles</div><div class="panel-body"><p>Vous devez créer 3 images.<br>Les spécifications de chaque image sont décrites ci-dessous.</p>
+<div class="panel-heading undefined">Poll</div><div class="panel-body"><p>L'image doit être basée sur une image officielle de <a target="_blank" href="https://hub.docker.com/_/python" title="null"><code>Python alpine</code></a>.</p>
+<p>Les dépendances de l'application doivent être installées.</p>
+<p>L'application peut être démarrée avec :</p>
+<p><code>flask run --host=0.0.0.0 --port=80</code></p>
+<p>Elle s'exposera au port <code>80</code>.</p>
+</div><div class="panel-heading undefined">Result</div><div class="panel-body"><p>L'image doit être basée sur une image officielle <a target="_blank" href="https://hub.docker.com/_/node" title="null"><code>Node.js 23 slim</code></a>.</p>
+<p>Les dépendances de l'application doivent être installées.</p>
+<p>Le répertoire <code>node_modules</code> doit être exclu du contexte de construction.</p>
+<p>L'application peut être démarrée avec :</p>
+<p><code>npm start</code></p>
+<p>Elle s'exposera au port <code>80</code>.</p>
+</div><div class="panel-heading undefined">Worker</div><div class="panel-body"><p>L'image sera construite en utilisant une construction en plusieurs étapes.</p>
+<div class="panel-heading undefined">Première étape - build</div><div class="panel-body"><p>La première étape doit être basée sur <code>maven:3.9.9-eclipse-temurin-24-alpine</code> et être nommée <code>builder</code>.</p>
+<p>Elle doit être utilisée pour construire (bien sûr) et empaqueter l'application Worker en utilisant les commandes suivantes :</p>
+<ul>
+<li><code>mvn dependency:resolve</code>, depuis le répertoire contenant <code>pom.xml</code>.</li>
+<li>puis, <code>mvn package</code>, à partir du répertoire contenant le répertoire <code>src</code>.</li>
+</ul>
+<p>Cela génère un fichier dans le répertoire cible nommé <code>worker-jar-with-dependencies.jar</code> dans le dossier <code>target</code> (relatif à votre répertoire <code>WORKDIR</code>).</p>
+</div><div class="panel-heading undefined">Deuxième étape - exécution</div><div class="panel-body"><p>La deuxième étape doit être basée sur <code>eclipse-temurin:24-jre-alpine</code>.</p>
+<p>C'est celle qui exécute réellement le worker en utilisant la commande :</p>
+<p><code>java -jar worker-jar-with-dependencies.jar</code></p>
+</div></div></div><div class="panel-heading panel-project">Consignes Docker compose</div><div class="panel-body"><p>Vous avez maintenant 3 Dockerfiles qui créent 3 images isolées.</p>
+<p>Il est maintenant temps de les faire fonctionner ensemble en utilisant Docker Compose !</p>
+<p>Créez un fichier <code>docker-compose.yml</code> qui sera responsable de l'exécution et de la liaison de vos conteneurs.</p>
+<p>Votre fichier Docker Compose doit contenir :</p>
+<div class="panel-heading panel-project"><strong>5 services</strong></div><div class="panel-body"><div class="panel-heading undefined">poll</div><div class="panel-body"><ul>
+<li>Construit votre image de <code>poll</code>.</li>
+<li>Redirige le port <code>5000</code> de l'hôte vers le port <code>80</code> du conteneur.</li>
+<li>Définit correctement la variable d'environnement nécessaire.</li>
+</ul>
+</div><div class="panel-heading undefined">redis</div><div class="panel-body"><ul>
+<li>Utilise une image officielle existante de <a target="_blank" href="https://hub.docker.com/_/redis" title="null"><code>Redis 7</code></a>.</li>
+<li>Ouvre le port <code>6379</code>.</li>
+</ul>
+</div><div class="panel-heading undefined">worker</div><div class="panel-body"><ul>
+<li>Construit votre image de <code>worker</code></li>
+<li>Définit correctement les mêmes variables d'environnement que les services <code>poll</code> et <code>result</code>.</li>
+</ul>
+</div><div class="panel-heading undefined">db</div><div class="panel-body"><ul>
+<li>Utilise une image officielle existante de <code>PostgreSQL 16</code>(<a target="_blank" href="https://hub.docker.com/_/postgres" title="undefined">https://hub.docker.com/_/postgres</a>).</li>
+<li>A son schéma de base de données créé lors du premier démarrage du conteneur.</li>
+<li>Définit correctement les variables d'environnement appropriées.</li>
+<li>Ouvre le port <code>5432</code></li>
+</ul>
+</div><div class="panel-heading undefined">result</div><div class="panel-body"><ul>
+<li>Construit votre image de <code>result</code>.</li>
+<li>Redirige le port <code>5001</code> de l'hôte vers le port <code>80</code> du conteneur.</li>
+<li>Définit correctement les variables d'environnement nécessaires.</li>
+</ul>
+</div></div><div class="panel-heading panel-project"><strong>3 réseaux</strong></div><div class="panel-body"><ul>
+<li><code>poll-network</code> pour permettre le service <code>poll</code> de communiquer avec <code>redis</code>.</li>
+<li><code>result-network</code> pour permettre le service <code>result</code> de communiquer avec <code>db</code>.</li>
+<li><code>worker-network</code> pour permettre le service <code>worker</code> de communiquer avec <code>redis</code> et <code>db</code>.</li>
+</ul>
+</div><div class="panel-heading panel-project"><strong>1 volume</strong></div><div class="panel-body"><ul>
+<li><code>db-data</code> pour permettre aux données de la base de données d'être persistantes, si le conteneur s'éteint.</li>
+</ul>
+</div><div class="panel-heading panel-warning">Attention</div><div class="panel-body"><p>Il est interdit d'utiliser l'instruction <code>ENTRYPOINT</code> dans les <strong><em>Dockerfile</em></strong>.<br>Il est également interdit d'utiliser les <code>links</code> dans le <strong><em>docker-compose</em></strong></p>
+</div></div><div class="panel-heading panel-project">Architecture du projet</div><div class="panel-body"><p>Vous pouvez pousser les fichiers donnés en ressources, ce n'est pas obligatoire, mais dans un portfolio c'est plus fonctionnel avec toute l'application :)</p>
+<div class="code-toolbar"><pre class=" language-markup"><code class=" language-markup">.
+├── docker-compose.yml
+├── ...
+├── poll/
+|    |   ...
+|    └── Dockerfile
+├── result/
+|    |   ...
+|    └── Dockerfile
+└── worker/
+     |   ...
+     └── Dockerfile</code></pre><div class="toolbar"><div class="toolbar-item"><button>Copy</button></div></div></div></div></body></html>
